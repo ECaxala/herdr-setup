@@ -395,7 +395,7 @@ export default class Spaces extends View {
       const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
       const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
       const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
-        .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
+        .when(collapsed, el => el.w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
         .cursor_pointer().hover(s => s.bg(t.hover))
         .on_click((_e, cx) => {
           if (collapsed && login) { run("app.settings", { section: "machines" }); return; }
@@ -532,14 +532,14 @@ export default class Spaces extends View {
       );
   }
 
-  compact({ w, i }, t) {
+  compact({ w, i, tree }, t) {
     const color = (shared("space.colors") ?? {})[w.id] ?? "ansi6";
     const fill = markFill(t, color);
     return railCell(h_flex()
       .id(`space-${w.id}`)
       .relative()
       .w(RAIL_CELL)
-      .h(26)
+      .h(rowHeight({ tree }))
       .rounded(6)
       .justify_center()
       .items_center()

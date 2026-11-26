@@ -22,7 +22,7 @@ function toggleSidebar() {
   if (!narrow()) setShared("sidebar.width", width);
   // Mods edited before the rail went by width still read the flag.
   setShared("sidebar.collapsed", !narrow());
-  run("layout.resize", { id: "sidebar", px: narrow() ? (shared("sidebar.width") ?? 268) : window()?.platform === "macos" ? 76 : 44 });
+  run("layout.resize", { id: "sidebar", px: narrow() ? (shared("sidebar.width") ?? 268) : window()?.platform === "macos" ? 50 : 44 });
 }
 
 // Drops what an agent puts before its title: a status glyph or spinner and the separator
@@ -184,6 +184,26 @@ export default class Agents extends View {
     });
   }
 
+  // A sub-agent on the rail: its icon and status, as tall as its row in the full list.
+  subCompact(t, s, shown) {
+    const k = s.t;
+    return h_flex()
+      .id(`sub-${k.address}`)
+      .h(26)
+      .mx(6)
+      .px(2)
+      .rounded(6)
+      .flex_none()
+      .items_center()
+      .gap(4)
+      .when(k.address === shown, (el) => el.bg(t.raised))
+      .hover((s) => s.bg(t.hover))
+      .tooltip(k.name || k.template || k.program?.name || k.address)
+      .on_click(() => (this.listed.has(k.address) ? run("pane.focus", { terminal: k.address }) : this.peek(k.address)))
+      .child(h_flex().flex_1().items_center().justify_center().child(icon(k.program, 14, t.foreground)))
+      .child(h_flex().w(14).flex_none().items_center().justify_center().child(this.status(t, { status: kidStatus(k, this.listed) }, true)));
+  }
+
   subRow(t, s, shown, compact) {
     const k = s.t;
     const st = kidStatus(k, this.listed);
@@ -235,7 +255,7 @@ export default class Agents extends View {
     this.track(list, now);
     // A kept sub-agent (one with a pane) is in agents() too: where a tree shows
     // it, it gets no row of its own, unless it's pinned.
-    const nested = new Set(collapsed ? [] : list.flatMap((a) => this.tree(all, a.address).map((s) => s.t.address)));
+    const nested = new Set(list.flatMap((a) => this.tree(all, a.address).map((s) => s.t.address)));
     list = list.filter((a) => a.pinned || !nested.has(a.address));
     const tabCounts = new Map();
     for (const a of list) tabCounts.set(a.tab, (tabCounts.get(a.tab) ?? 0) + 1);
@@ -251,10 +271,10 @@ export default class Agents extends View {
     setAgentOrder(list.map((a) => a.address));
 
     const withKids = (a, i) => {
-      const subs = collapsed ? [] : this.tree(all, a.address);
+      const subs = this.tree(all, a.address);
       const r = row(a, i, subs);
       if (this.folded.has(a.address)) return [r];
-      return [r, ...subs.map((s) => this.subRow(t, s, shown, byPriority))];
+      return [r, ...subs.map((s) => (collapsed ? this.subCompact(t, s, shown) : this.subRow(t, s, shown, byPriority)))];
     };
 
     // The fold chevron; folded, the count too, colored by the most urgent one.
@@ -310,7 +330,7 @@ export default class Agents extends View {
       if (collapsed) {
         return h_flex()
           .id(`ag-${a.address}`)
-          .h(26)
+          .h(30)
           .mx(6)
           .px(2)
           .rounded(6)
@@ -394,6 +414,27 @@ export default class Agents extends View {
     const header = (g) => {
       const open = !this.folded.has(g.id);
       const top = g.members.reduce((m, a) => ((RANK[a.status] ?? 0) > (RANK[m] ?? 0) ? a.status : m), null);
+      // On the rail the header keeps its height, so the icons stay where they were: a short rule, or a chevron while folded.
+      if (collapsed) {
+        return h_flex()
+          .id(g.id)
+          .mx(6)
+          .pt(8)
+          .h(30)
+          .flex_none()
+          .items_center()
+          .justify_center()
+          .rounded(6)
+          .cursor_pointer()
+          .tooltip(g.label)
+          .hover((s) => s.bg(t.hover))
+          .on_click((_e, cx) => {
+            open ? this.folded.add(g.id) : this.folded.delete(g.id);
+            cx.notify();
+          })
+          .when(open, (el) => el.child(div().w(14).h(1).bg(t[g.status] ?? t.border)))
+          .when(!open, (el) => el.child(svg("mods/workspace-chrome/chevron-right.svg").size(11).flex_none().text_color(t[top] ?? t.dim)));
+      }
       return h_flex()
         .id(g.id)
         .px(8)
@@ -417,9 +458,7 @@ export default class Agents extends View {
           .when(!byPriority && top && top !== "idle", (el) => el.child(this.status(t, { status: top }, true)))
           .child(svg("mods/workspace-chrome/chevron-right.svg").size(11).flex_none().text_color(t.dim)));
     };
-    const rows = collapsed
-      ? list.flatMap(withKids)
-      : groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : g.members.flatMap(withKids))]);
+    const rows = groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : g.members.flatMap(withKids))]);
 
     return v_flex()
       .size_full()
@@ -428,6 +467,7 @@ export default class Agents extends View {
       .border_t(1)
       .border_color(t.border)
       .text_size(13)
+      .when(collapsed, (el) => el.child(div().h(41).flex_none()))
       .when(!collapsed, (el) =>
         el.child(
           h_flex()

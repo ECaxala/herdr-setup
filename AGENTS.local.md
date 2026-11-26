@@ -15,7 +15,9 @@
 - I use `DEVandro` (my clone of `main`, formerly `my-main`) with `my-spaces` and `my-agents` (clones of
   `spaces`/`agents`). Only change: the narrow sidebar rail shows space avatars
   (colored letter tiles) and agent program icons instead of numbers.
-- `cmd-b` toggles the sidebar between the rail (76 px) and its last width (via `my-agents.toggle-sidebar`).
+  The rail keeps the full list's row and header heights (empty title space, a short rule per
+  agent group, sub-agents as small icons), so icons don't jump vertically when folding.
+- `cmd-b` toggles the sidebar between the rail (50 px; was 76) and its last width (via `my-agents.toggle-sidebar`).
 - No Files/Changes side panel: removed from `DEVandro`, and shared `workspace.panels` is `[]` so the tab bar shows no buttons for them.
 
 ## Themes
