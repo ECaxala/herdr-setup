@@ -8,6 +8,7 @@
 !/layouts/
 /layouts/*
 !/layouts/DEVandro.json
+!/layouts/DEVandro-light.json
 !/themes/
 /themes/atom-one-dark.json
 /themes/win98.json

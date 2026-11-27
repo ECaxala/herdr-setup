@@ -12,7 +12,8 @@
   ctrl-alt key stops reaching Herdr.
 
 ## Layout
-- I use `DEVandro` (my clone of `main`, formerly `my-main`) with `my-spaces` and `my-agents` (clones of
+- Two layouts: `DEVandro` is the full cockpit (base plus a hidden right-hand `gitview` panel); `DEVandro-light` is the base without it and needs no extra mods. Cockpit mods are installed separately and listed in the README's "Cockpit tools" table; the git view mod is my own fork, kept outside this repo.
+- Base layout: `DEVandro-light` (my clone of `main`, formerly `my-main`) with `my-spaces` and `my-agents` (clones of
   `spaces`/`agents`). Only change: the narrow sidebar rail shows space avatars
   (colored letter tiles) and agent program icons instead of numbers.
   The rail keeps the full list's row and header heights (empty title space, a short rule per
@@ -26,3 +27,21 @@
   instead of Herdr's derived neutral. New theme files need their own `chrome`.
 - `my-spaces` avatars use the theme's ANSI colors (not the shipped fixed `MARK` table),
   letter in theme background/foreground by contrast.
+
+## Publishing changes (GitHub repo)
+- This folder is also the git repo `ECaxala/herdr-setup` (remote `origin`, branch `main`).
+  `.gitignore` tracks only an allowlist: `README.md`, `install.sh`, `keys.json`,
+  `settings.json`, `layouts/DEVandro.json`, `layouts/DEVandro-light.json`, `mods/my-*`, `themes/`, `AGENTS.local.md`.
+- After you change anything tracked (layout, my-* mod, theme, keys, settings, install.sh),
+  or add a new layout/mod/theme, **ask me** whether to commit and push. Don't push on
+  your own. I may decline; stage only files that belong to the change I asked for.
+- Before asking, keep the repo consistent:
+  - New layout, mod or theme: add a `!` line to `.gitignore`. For a new mod or layout,
+    also update `MODS`/`LAYOUT` in `install.sh`.
+  - Whenever a tool is added to, changed in or removed from the cockpit (`DEVandro`), update the README's "Cockpit tools" table (what it's for, how it fits the workflow, where to get it) and `COCKPIT_MODS` in `install.sh`.
+  - Update `README.md` (contents table, key table, install/remove steps) if what the
+    setup contains or does changed.
+  - Run `herdr-app check` on any changed mod and `sh -n install.sh` if it changed.
+  - Update this file if the setup's behavior changed.
+- Write a short commit message about what changed. Note any other modified files
+  you left out of the commit.
