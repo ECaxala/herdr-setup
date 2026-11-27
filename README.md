@@ -35,11 +35,12 @@ window. That panel comes from a separate tool, so the cockpit grows as tools are
 
 | Tool | What it's for | How it fits the workflow |
 |---|---|---|
-| `gitview` | Review changes: files, diffs, staging, history | An agent finishes, you open the panel, check the diff, commit |
+| [`gitview`](https://github.com/ECaxala/herdr-gitview) | Review changes: files, diffs, staging, history. My fork adds opt-in vim motions in the diff pane (`V`) | An agent finishes, you open the panel, check the diff, commit |
 
 *More tools will be added here. Where to get each one is noted next to it; a missing
 tool only leaves its panel empty, the layout still works.* `./install.sh --full`
-tells you which tools you don't have yet.
+tells you which tools you don't have yet and offers to install `gitview` from the fork
+(`curl -fsSL https://raw.githubusercontent.com/ECaxala/herdr-gitview/main/install.sh | sh -s -- --app`).
 
 ## Install
 

@@ -17,6 +17,7 @@ SRC=$(cd "$(dirname "$0")" && pwd)
 HOME_DIR=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
 LAYOUT=DEVandro-light
 COCKPIT_MODS="gitview"
+GITVIEW_INSTALL="https://raw.githubusercontent.com/ECaxala/herdr-gitview/main/install.sh"
 MODS="my-spaces my-agents"
 
 FULL=0
@@ -75,11 +76,21 @@ fi
 
 [ "$DRY" = 1 ] && { echo; echo "Dry run: nothing changed."; exit 0; }
 
-if [ "$FULL" = 1 ]; then
+if [ "$FULL" = 1 ] && [ "$DRY" = 0 ]; then
   echo
   for m in $COCKPIT_MODS; do
     [ -d "$HOME_DIR/mods/$m" ] || echo "missing mods/$m: the cockpit panel stays empty until you add it (see the README)"
   done
+  if [ ! -d "$HOME_DIR/mods/gitview" ]; then
+    echo "gitview is not installed. Its installer (my fork, from $GITVIEW_INSTALL)"
+    echo "downloads a release bundle and installs it into $HOME_DIR."
+    printf "Run it now? [y/N] "
+    read -r ans || ans=n
+    case $ans in
+      y|Y) curl -fsSL "$GITVIEW_INSTALL" | sh -s -- --app || echo "gitview install failed; install it later (README, Cockpit tools)." >&2 ;;
+      *) echo "skipped; install it later (README, Cockpit tools)." ;;
+    esac
+  fi
 fi
 
 echo
