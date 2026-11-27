@@ -67,7 +67,9 @@
     "ctrl-alt-h": "pane.go:left",
     "ctrl-alt-j": "pane.go:down",
     "ctrl-alt-k": "pane.go:up",
-    "ctrl-alt-l": "pane.go:right"
+    "ctrl-alt-l": "pane.go:right",
+    "cmd-shift-g": "mod.open:gitview-sidebar",
+    "cmd-g": "mod.open:gitview-tab"
   },
   "terminal": {
     "cmd-f": "terminal.search",
