@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "New worktree…",
+  "overlay": { "kind": "window", "width": 2, "height": 2, "frame": "none" },
+  "palette": [
+    { "title": "New worktree…", "command": "mod.open", "args": { "name": "worktree-new" }, "group": "Worktree", "words": "git branch checkout create space" }
+  ]
+}

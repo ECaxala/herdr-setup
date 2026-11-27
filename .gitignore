@@ -2,6 +2,7 @@
 !/.gitignore
 !/README.md
 !/install.sh
+!/bin/
 !/AGENTS.local.md
 !/keys.json
 !/settings.json
@@ -16,5 +17,8 @@
 /mods/*
 !/mods/my-spaces/
 !/mods/my-agents/
+!/mods/worktree-new/
+!/mods/worktree-new-claude/
+!/mods/worktree-open/
 /mods/*/jsconfig.json
 /mods/*/*.d.ts

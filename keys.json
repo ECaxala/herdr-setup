@@ -69,7 +69,10 @@
     "ctrl-alt-k": "pane.go:up",
     "ctrl-alt-l": "pane.go:right",
     "cmd-shift-g": "mod.open:gitview-sidebar",
-    "cmd-g": "mod.open:gitview-tab"
+    "cmd-g": "mod.open:gitview-tab",
+    "cmd-shift-n": "mod.open:worktree-new",
+    "cmd-alt-n": "mod.open:worktree-new-claude",
+    "cmd-shift-o": "mod.open:worktree-open"
   },
   "terminal": {
     "cmd-f": "terminal.search",

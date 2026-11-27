@@ -8,6 +8,8 @@
 #   ./install.sh --keys     also install keys.json (existing one is backed up)
 #   ./install.sh --dry-run  show what would happen, change nothing
 #
+# Also copies bin/herdr-worktree to ~/.local/bin (HERDR_BIN_DIR picks another).
+#
 # Local only: no network calls, nothing is ever overwritten except keys.json
 # (and only with --keys, after a timestamped backup).
 
@@ -18,7 +20,8 @@ HOME_DIR=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
 LAYOUT=DEVandro-light
 COCKPIT_MODS="gitview"
 GITVIEW_INSTALL="https://raw.githubusercontent.com/ECaxala/herdr-gitview/main/install.sh"
-MODS="my-spaces my-agents"
+MODS="my-spaces my-agents worktree-new worktree-new-claude worktree-open"
+BIN_DIR=${HERDR_BIN_DIR:-$HOME/.local/bin}
 
 FULL=0
 KEYS=0
@@ -28,7 +31,7 @@ for arg in "$@"; do
     --full) FULL=1; LAYOUT=DEVandro ;;
     --keys) KEYS=1 ;;
     --dry-run) DRY=1 ;;
-    -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $arg" >&2; exit 2 ;;
   esac
 done
@@ -53,6 +56,7 @@ copy_new() {
 
 echo "Installing into $HOME_DIR"
 echo "Writes: layouts/$LAYOUT.json (+ DEVandro-light), mods/{$(echo $MODS | tr ' ' ,)}, themes/*.json"
+echo "        $BIN_DIR/herdr-worktree"
 [ "$KEYS" = 1 ] && echo "        keys.json (backed up first)"
 echo
 
@@ -62,6 +66,8 @@ copy_new "$SRC/layouts/DEVandro-light.json" "$HOME_DIR/layouts/DEVandro-light.js
 [ "$FULL" = 1 ] && copy_new "$SRC/layouts/DEVandro.json" "$HOME_DIR/layouts/DEVandro.json"
 for m in $MODS; do copy_new "$SRC/mods/$m" "$HOME_DIR/mods/$m"; done
 for t in "$SRC"/themes/*.json; do copy_new "$t" "$HOME_DIR/themes/$(basename "$t")"; done
+run mkdir -p "$BIN_DIR"
+copy_new "$SRC/bin/herdr-worktree" "$BIN_DIR/herdr-worktree"
 
 if [ "$KEYS" = 1 ]; then
   if [ -e "$HOME_DIR/keys.json" ]; then

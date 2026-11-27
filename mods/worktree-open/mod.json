@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "Open worktree…",
+  "overlay": { "kind": "window", "width": 2, "height": 2, "frame": "none" },
+  "palette": [
+    { "title": "Open worktree…", "command": "mod.open", "args": { "name": "worktree-open" }, "group": "Worktree", "words": "git branch checkout switch space reopen" }
+  ]
+}

@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# herdr-worktree: create (or reuse) a git worktree the way Herdr's
+# "New worktree" does, and open it as a Herdr space, optionally with Claude
+# already working on a task.
+#
+#   herdr-worktree <branch> [--name <name>] [--task "..."] [--base <ref>] [--no-agent] [--focus]
+#
+# - Branch: in the team format (slice/<feature>, docs/..., chore/...).
+# - Path: <worktrees.directory>/<repo>/<folder>, worktrees.directory from
+#   ~/.config/herdr-app/settings.json (default ~/.herdr/worktrees). Folder:
+#   the branch with / as - (slice/alarm-history -> slice-alarm-history), as
+#   Herdr's dialog names it; --name overrides. The space shows the folder.
+# - Existing branch: checked out. New branch: created from --base (default
+#   HEAD of the current checkout, as Herdr does).
+# - Existing worktree for that path: reused, nothing is created.
+# - The space is left unnamed so it nests under the repo in Herdr's sidebar.
+# - With --task, the space starts `claude` with that first message.
+#   --no-agent opens only a shell. --focus switches to the new space.
+# Run it from inside the repo (any checkout of it).
+set -euo pipefail
+
+usage() { sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; exit "${1:-0}"; }
+
+branch="" name="" task="" base="HEAD" agent=1 focus=false
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --name) name="${2:?--name needs a name}"; shift 2 ;;
+    --task) task="${2:?--task needs text}"; shift 2 ;;
+    --base) base="${2:?--base needs a ref}"; shift 2 ;;
+    --no-agent) agent=0; shift ;;
+    --focus) focus=true; shift ;;
+    -h|--help) usage ;;
+    -*) echo "unknown option: $1" >&2; usage 2 ;;
+    *) [[ -z "$branch" ]] || { echo "only one branch" >&2; usage 2; }; branch="$1"; shift ;;
+  esac
+done
+[[ -n "$branch" ]] || usage 2
+
+common="$(git rev-parse --path-format=absolute --git-common-dir)"
+main="${common%/.git}"
+repo="$(basename "$main")"
+[[ "$repo" == ".bare" ]] && repo="$(basename "$(dirname "$main")")"
+
+settings="${HERDR_APP_HOME:-$HOME/.config/herdr-app}/settings.json"
+dir="$(python3 -c 'import json,sys
+try: print(json.load(open(sys.argv[1])).get("worktrees",{}).get("directory") or "")
+except Exception: print("")' "$settings")"
+dir="${dir:-~/.herdr/worktrees}"
+[[ "$dir" == "~" || "$dir" == "~/"* ]] && dir="$HOME${dir:1}"
+dir="${dir%/}"
+
+name="${name:-$branch}"
+slug="$(printf '%s' "$name" | sed -E 's/[^[:alnum:]._-]+/-/g; s/^-+//; s/-+$//')"
+[[ -n "$slug" ]] || { echo "branch name gives an empty folder name" >&2; exit 2; }
+path="$dir/$repo/$slug"
+
+if git -C "$main" worktree list --porcelain | grep -qxF "worktree $path"; then
+  echo "reusing worktree $path"
+elif git -C "$main" show-ref --verify --quiet "refs/heads/$branch"; then
+  mkdir -p "$(dirname "$path")"
+  git -C "$main" worktree add "$path" "$branch"
+else
+  mkdir -p "$(dirname "$path")"
+  git worktree add -b "$branch" "$path" "$base"
+fi
+
+args=(do space.new --folder "$path" --focus "$focus")
+if [[ $agent -eq 1 && -n "$task" ]]; then
+  args+=(--argv '["claude"]' --task "$task")
+fi
+"${HERDR_APP_BIN:-$HOME/.local/bin/herdr-app}" "${args[@]}"
+
+echo "worktree: $path"
+echo "branch:   $branch"
+if [[ $agent -eq 1 && -n "$task" ]]; then echo "space:    opened with claude on the task"; else echo "space:    opened (shell)"; fi

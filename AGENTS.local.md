@@ -21,6 +21,14 @@
 - `cmd-b` toggles the sidebar between the rail (50 px; was 76) and its last width (via `my-agents.toggle-sidebar`).
 - No Files/Changes side panel: removed from `DEVandro`, and shared `workspace.panels` is `[]` so the tab bar shows no buttons for them.
 
+## Worktrees
+- One space per git worktree (Herdr's model). `worktree-new`, `worktree-new-claude`, `worktree-open` are
+  launcher mods: they open the shipped `worktree` dialog (`mod.open` can't pass props, hence three mods)
+  and close themselves. Keys `cmd-shift-n` / `cmd-alt-n` / `cmd-shift-o`, plus palette entries.
+- `bin/herdr-worktree` is the shell twin for agents (team-format branch, Herdr's folder layout,
+  `herdr-app do space.new` with `claude` + task). `~/.local/bin/herdr-worktree` is a symlink to it here.
+- `my-spaces` shows `folder-tree.svg` (Lucide) for worktree spaces instead of the branch icon.
+
 ## Themes
 - Each `themes/*.json` (except win98) sets `colors.chrome` to its palette's sidebar color
   (rose-pine `#1f1d2e`, catppuccin mantle, etc.) so the sidebar/bars follow the theme
@@ -31,7 +39,7 @@
 ## Publishing changes (GitHub repo)
 - This folder is also the git repo `ECaxala/herdr-setup` (remote `origin`, branch `main`).
   `.gitignore` tracks only an allowlist: `README.md`, `install.sh`, `keys.json`,
-  `settings.json`, `layouts/DEVandro.json`, `layouts/DEVandro-light.json`, `mods/my-*`, `themes/`, `AGENTS.local.md`.
+  `settings.json`, `layouts/DEVandro.json`, `layouts/DEVandro-light.json`, `mods/my-*`, `mods/worktree-*`, `bin/`, `themes/`, `AGENTS.local.md`.
 - After you change anything tracked (layout, my-* mod, theme, keys, settings, install.sh),
   or add a new layout/mod/theme, **ask me** whether to commit and push. Don't push on
   your own. I may decline; stage only files that belong to the change I asked for.
